@@ -19,6 +19,12 @@ touch .env
 echo "DATABASE_URL=sqlite+aiosqlite:///./fastapi.db" >> .env
 # Добавление секретного ключа
 echo "SECRET=$(python -c 'import secrets; print(secrets.token_urlsafe(32))')" >> .env
+
+# Опционально:
+# Создать суперпользователя при первом запуске
+# Укажите собственные FIRST_SUPERUSER_EMAIL и FIRST_SUPERUSER_PASSWORD
+echo "FIRST_SUPERUSER_EMAIL=root@admin.ru" >> .env
+echo "FIRST_SUPERUSER_PASSWORD=root" >> .env
 ```
 
 Cоздать и активировать виртуальное окружение:
