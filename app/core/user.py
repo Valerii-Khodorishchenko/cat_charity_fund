@@ -1,8 +1,11 @@
+from typing import Union
+
 from fastapi import Depends
 from fastapi_users import (
     BaseUserManager,
     FastAPIUsers,
     IntegerIDMixin,
+    InvalidPasswordException
 )
 from fastapi_users.authentication import (
     AuthenticationBackend,
@@ -15,10 +18,19 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import settings
 from app.core.db import get_async_session
 from app.models.user import User
+from app.schemas.user import UserCreate
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
-    pass
+    async def validate_password(
+            self,
+            password: str,
+            user: Union[UserCreate, User]
+    ) -> None:
+        if len(password) < 3:
+            raise InvalidPasswordException(
+                reason='Пароль должен содержать не менее 3 символов.'
+            )
 
 
 async def get_user_db(session: AsyncSession = Depends(get_async_session)):
