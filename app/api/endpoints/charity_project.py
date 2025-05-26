@@ -39,9 +39,10 @@ async def create_charity_project(
         project: CharityProjectCreate,
         session: AsyncSession = Depends(get_async_session)
 ):
-    """Только для суперюзеров.
-
-        Создаёт благотворительный проект."""
+    """
+    Только для суперюзеров.\n
+    Создаёт благотворительный проект.
+    """
     await check_name_project(project.name, session)
     return await charity_project_crud.create(project, session)
 
@@ -56,10 +57,11 @@ async def delete_charity_project(
         project_id: int,
         session: AsyncSession = Depends(get_async_session),
 ):
-    """Только для суперюзеров.
-
-    Удаляет проект. Нельзя удалить проект, в который уже были 
-    инвестированы средства, его можно только закрыть."""
+    """
+    Только для суперюзеров.\n
+    Удаляет проект. Нельзя удалить проект, в который уже были
+    инвестированы средства, его можно только закрыть.
+    """
     project = await get_project_or_404('id', project_id, session)
     await check_fully_invested(project)
     await check_exist_invested_amount(project)
@@ -77,10 +79,11 @@ async def update_charity_project(
         changes: CharityProjectUpdate,
         session: AsyncSession = Depends(get_async_session),
 ):
-    """Только для суперюзеров.
-
-    Закрытый проект нельзя редактировать; нельзя установить требуемую сумму 
-    меньше уже вложенной."""
+    """
+    Только для суперюзеров.\n
+    Закрытый проект нельзя редактировать;
+    нельзя установить требуемую сумму меньше уже вложенной.
+    """
     project = await get_project_or_404('id', project_id, session)
     await check_fully_invested(project)
     if project.name != changes.name:
