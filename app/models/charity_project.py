@@ -1,9 +1,11 @@
 from sqlalchemy import Column, String, Text
 
-from app.core.db import Base
-from app.models.mixins import InvestmentMixin
+from app.models.investment import Investment
 
 
-class CharityProject(Base, InvestmentMixin):
+class CharityProject(Investment):
     name = Column(String(100), unique=True, nullable=False)
     description = Column(Text, nullable=False)
+
+    def __repr__(self):
+        return f'{super().__repr__()}, Проект: {self.name}'[:40]

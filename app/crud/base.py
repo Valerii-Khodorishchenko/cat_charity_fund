@@ -1,12 +1,12 @@
 from typing import Generic, List, Optional, TypeVar
 
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.db import Base
 from app.models import User
-from app.services.investment import invest_funds
 
 
 ModelType = TypeVar('ModelType', bound=Base)
@@ -29,14 +29,47 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         db_objs = await session.scalars(query)
         return db_objs.all()
 
-    async def create(
+    async def get_not_fully_invested(
+            self,
+            session: AsyncSession
+    ) -> List[ModelType]:
+        recipients = await session.scalars(
+            select(self.model).where(self.model.fully_invested == 0)
+        )
+        return recipients.all()
+
+    def create(
             self,
             obj_in,
-            session: AsyncSession,
             user: Optional[User] = None
     ) -> ModelType:
         obj_in_data = obj_in.dict()
         if user is not None:
             obj_in_data['user_id'] = user.id
-        db_obj = self.model(**obj_in_data)
-        return await invest_funds(db_obj, session)
+        db_obj = self.model(**obj_in_data, invested_amount=0)
+        return db_obj
+
+    async def update(
+            self,
+            db_obj,
+            obj_in,
+            session: AsyncSession,
+    ) -> ModelType:
+        obj_data = jsonable_encoder(db_obj)
+        update_data = obj_in.dict(exclude_unset=True)
+        for field in obj_data:
+            if field in update_data:
+                setattr(db_obj, field, update_data[field])
+        session.add(db_obj)
+        await session.commit()
+        await session.refresh(db_obj)
+        return db_obj
+
+    async def delete(
+            self,
+            db_obj,
+            session: AsyncSession,
+    ) -> ModelType:
+        await session.delete(db_obj)
+        await session.commit()
+        return db_obj

@@ -15,7 +15,8 @@ from app.schemas.charity_project import (
     CharityProjectDB,
     CharityProjectUpdate
 )
-from app.crud.charity_project import charity_project_crud
+from app.crud import charity_project_crud, donation_crud
+from app.services.investment import invest_funds
 
 
 router = APIRouter()
@@ -44,7 +45,14 @@ async def create_charity_project(
     Создаёт благотворительный проект.
     """
     await check_name_project(project.name, session)
-    return await charity_project_crud.create(project, session)
+    project = charity_project_crud.create(project)
+    donation = await donation_crud.get_not_fully_invested(session)
+    updated_donation = await invest_funds(project, donation)
+    session.add_all(updated_donation)
+    session.add(project)
+    await session.commit()
+    await session.refresh(project)
+    return project
 
 
 @router.delete(
@@ -63,8 +71,8 @@ async def delete_charity_project(
     инвестированы средства, его можно только закрыть.
     """
     project = await get_project_or_404('id', project_id, session)
-    await check_fully_invested(project)
-    await check_exist_invested_amount(project)
+    check_fully_invested(project)
+    check_exist_invested_amount(project)
     return await charity_project_crud.delete(project, session)
 
 
@@ -85,9 +93,9 @@ async def update_charity_project(
     нельзя установить требуемую сумму меньше уже вложенной.
     """
     project = await get_project_or_404('id', project_id, session)
-    await check_fully_invested(project)
+    check_fully_invested(project)
     if project.name != changes.name:
         await check_name_project(changes.name, session)
     if changes.full_amount:
-        await check_fully_amount(project, changes)
+        check_fully_amount(project, changes)
     return await charity_project_crud.update(project, changes, session)

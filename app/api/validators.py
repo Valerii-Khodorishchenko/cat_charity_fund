@@ -1,7 +1,8 @@
 from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
+from starlette import status
 
-from app.crud.charity_project import charity_project_crud
+from app.crud import charity_project_crud
 from app.models import CharityProject
 from app.schemas.charity_project import CharityProjectUpdate
 
@@ -26,7 +27,7 @@ async def check_name_project(
     )
     if project is not None:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_MESSAGE_PROJECT_NAME_EXIST,
         )
 
@@ -41,38 +42,38 @@ async def get_project_or_404(
     )
     if project is None:
         raise HTTPException(
-            status_code=404,
+            status_code=status.HTTP_404_NOT_FOUND,
             detail=ERROR_MESSAGE_PROJECT_NAME_EXIST,
         )
     return project
 
 
-async def check_fully_invested(
-        project: CharityProject,
+def check_fully_invested(
+    project: CharityProject,
 ):
     if project.fully_invested:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_MESSAGE_PROJECT_FULLY_INVESTED,
         )
 
 
-async def check_fully_amount(
-        project: CharityProject,
-        changes: CharityProjectUpdate,
+def check_fully_amount(
+    project: CharityProject,
+    changes: CharityProjectUpdate,
 ):
     if project.invested_amount > changes.full_amount:
         raise HTTPException(
-            status_code=422,
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             detail=ERROR_MESSAGE_PROJECT_FULLY_AMOUNT,
         )
 
 
-async def check_exist_invested_amount(
-        project: CharityProject
+def check_exist_invested_amount(
+    project: CharityProject
 ):
     if project.invested_amount:
         raise HTTPException(
-            status_code=400,
+            status_code=status.HTTP_400_BAD_REQUEST,
             detail=ERROR_MESSAGE_INVESTED_PROJECT
         )

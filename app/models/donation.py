@@ -1,9 +1,11 @@
 from sqlalchemy import Column, ForeignKey, Integer, Text
 
-from app.core.db import Base
-from app.models.mixins import InvestmentMixin
+from app.models.investment import Investment
 
 
-class Donation(Base, InvestmentMixin):
+class Donation(Investment):
     user_id = Column(Integer, ForeignKey('user.id', name='fk_user_order_id'))
     comment = Column(Text)
+
+    def __repr__(self):
+        return f'{super().__repr__()}, Комментарий: {self.comment}'[:40]

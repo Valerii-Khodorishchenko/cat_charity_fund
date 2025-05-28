@@ -1,4 +1,3 @@
-
 from typing import Optional
 
 from sqlalchemy import select
@@ -29,29 +28,6 @@ class CharityProjectCRUD(CRUDBase[
             select(CharityProject).where(attr == attr_value)
         )
         return project.first()
-
-    async def update(
-            self,
-            project: CharityProject,
-            changes: CharityProjectUpdate,
-            session: AsyncSession
-    ) -> CharityProject:
-        update_data = changes.dict(exclude_unset=True)
-        for field, value in update_data.items():
-            setattr(project, field, value)
-        session.add(project)
-        await session.commit()
-        await session.refresh(project)
-        return project
-
-    async def delete(
-            self,
-            project: CharityProject,
-            session: AsyncSession
-    ) -> CharityProject:
-        await session.delete(project)
-        await session.commit()
-        return project
 
 
 charity_project_crud = CharityProjectCRUD(CharityProject)

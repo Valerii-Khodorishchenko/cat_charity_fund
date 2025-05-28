@@ -5,7 +5,7 @@ from pydantic import BaseSettings, EmailStr
 
 APP_NAME = 'QRKot'
 APP_DESCRIPTION = 'Сервис для поддержки котиков!'
-DATABASE_URL = "sqlite+aiosqlite:///./fastapi.db"
+DATABASE_URL = 'sqlite+aiosqlite:///./fastapi.db'
 SECRET = 'SECRET'
 
 
