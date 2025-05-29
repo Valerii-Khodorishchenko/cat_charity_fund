@@ -58,11 +58,11 @@ async def create_donation(
         session: AsyncSession = Depends(get_async_session)
 ):
     """Сделать пожертвование."""
-    donation = donation_crud.create(donation, user)
-    project = await charity_project_crud.get_not_fully_invested(session)
-    updated_projects = await invest_funds(donation, project)
-    session.add_all(updated_projects)
-    session.add(donation)
+    donation = await donation_crud.create(donation, session, user)
+    session.add_all(invest_funds(
+        donation,
+        await charity_project_crud.get_not_fully_invested(session)
+    ))
     await session.commit()
     await session.refresh(donation)
     return donation

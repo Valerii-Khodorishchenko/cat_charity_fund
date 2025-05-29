@@ -25,18 +25,14 @@ class Investment(Base):
                 name='check_full_amount_positive'
             ),
             CheckConstraint(
-                'invested_amount >= 0',
-                name='check_invested_amount_non_negative'
-            ),
-            CheckConstraint(
-                'invested_amount <= full_amount',
-                name='check_invested_not_exceed_full'
-            ),
-            CheckConstraint(
-                'close_date IS NULL OR close_date >= create_date',
-                name='check_close_date_after_create'
-            ),
+                'invested_amount >= 0 AND invested_amount <= full_amount',
+                name='check_invested_amount_range'
+            )
         )
 
     def __repr__(self):
-        return f'{self.__class__.__name__} id: {self.id}'
+        return (
+            f'{self.__class__.__name__},',
+            f'{self.id=}, {self.fully_invested=}, {self.invested_amount=},'
+            f'{self.full_amount=}, {self.create_date=}, {self.close_date=}'
+        )

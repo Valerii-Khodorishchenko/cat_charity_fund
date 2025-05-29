@@ -27,10 +27,8 @@ def upgrade():
     sa.Column('fully_invested', sa.Boolean(), nullable=True),
     sa.Column('create_date', sa.DateTime(), nullable=True),
     sa.Column('close_date', sa.DateTime(), nullable=True),
-    sa.CheckConstraint('close_date IS NULL OR close_date >= create_date', name='check_close_date_after_create'),
     sa.CheckConstraint('full_amount > 0', name='check_full_amount_positive'),
-    sa.CheckConstraint('invested_amount <= full_amount', name='check_invested_not_exceed_full'),
-    sa.CheckConstraint('invested_amount >= 0', name='check_invested_amount_non_negative'),
+    sa.CheckConstraint('invested_amount >= 0 AND invested_amount <= full_amount', name='check_invested_amount_range'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
@@ -53,10 +51,8 @@ def upgrade():
     sa.Column('fully_invested', sa.Boolean(), nullable=True),
     sa.Column('create_date', sa.DateTime(), nullable=True),
     sa.Column('close_date', sa.DateTime(), nullable=True),
-    sa.CheckConstraint('close_date IS NULL OR close_date >= create_date', name='check_close_date_after_create'),
     sa.CheckConstraint('full_amount > 0', name='check_full_amount_positive'),
-    sa.CheckConstraint('invested_amount <= full_amount', name='check_invested_not_exceed_full'),
-    sa.CheckConstraint('invested_amount >= 0', name='check_invested_amount_non_negative'),
+    sa.CheckConstraint('invested_amount >= 0 AND invested_amount <= full_amount', name='check_invested_amount_range'),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], name='fk_user_order_id'),
     sa.PrimaryKeyConstraint('id')
     )

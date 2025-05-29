@@ -24,10 +24,9 @@ class CharityProjectCRUD(CRUDBase[
             session: AsyncSession,
     ) -> Optional[CharityProject]:
         attr = getattr(CharityProject, attr_name)
-        project = await session.scalars(
+        return (await session.scalars(
             select(CharityProject).where(attr == attr_value)
-        )
-        return project.first()
+        )).first()
 
 
 charity_project_crud = CharityProjectCRUD(CharityProject)

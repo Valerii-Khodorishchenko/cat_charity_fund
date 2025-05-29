@@ -1,4 +1,4 @@
-from typing import Generic, List, Optional, TypeVar
+from typing import Generic, Optional, TypeVar
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
@@ -22,31 +22,31 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             self,
             session: AsyncSession,
             user: Optional[User] = None
-    ) -> List[ModelType]:
+    ) -> list[ModelType]:
         query = select(self.model)
         if user is not None:
             query = query.where(self.model.user_id == user.id)
-        db_objs = await session.scalars(query)
-        return db_objs.all()
+        return (await session.scalars(query)).all()
 
     async def get_not_fully_invested(
             self,
             session: AsyncSession
-    ) -> List[ModelType]:
-        recipients = await session.scalars(
+    ) -> list[ModelType]:
+        return (await session.scalars(
             select(self.model).where(self.model.fully_invested == 0)
-        )
-        return recipients.all()
+        )).all()
 
-    def create(
+    async def create(
             self,
             obj_in,
+            session: AsyncSession,
             user: Optional[User] = None
     ) -> ModelType:
         obj_in_data = obj_in.dict()
         if user is not None:
             obj_in_data['user_id'] = user.id
         db_obj = self.model(**obj_in_data, invested_amount=0)
+        session.add(db_obj)
         return db_obj
 
     async def update(

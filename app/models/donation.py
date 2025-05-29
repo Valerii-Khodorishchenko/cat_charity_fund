@@ -8,4 +8,4 @@ class Donation(Investment):
     comment = Column(Text)
 
     def __repr__(self):
-        return f'{super().__repr__()}, Комментарий: {self.comment}'[:40]
+        return f'{super().__repr__()}, {self.user_id=}, {self.comment=}'

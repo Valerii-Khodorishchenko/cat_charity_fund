@@ -45,11 +45,11 @@ async def create_charity_project(
     Создаёт благотворительный проект.
     """
     await check_name_project(project.name, session)
-    project = charity_project_crud.create(project)
-    donation = await donation_crud.get_not_fully_invested(session)
-    updated_donation = await invest_funds(project, donation)
-    session.add_all(updated_donation)
-    session.add(project)
+    project = await charity_project_crud.create(project, session)
+    session.add_all(invest_funds(
+        project,
+        await donation_crud.get_not_fully_invested(session)
+    ))
     await session.commit()
     await session.refresh(project)
     return project
