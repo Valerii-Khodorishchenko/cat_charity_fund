@@ -9,8 +9,7 @@ def invest_funds(
 ) -> list[Investment]:
     update_sources = []
     for source in sources:
-        if target.fully_invested:
-            break
+        update_sources.append(source)
         transfer_amount = min(
             target.full_amount - target.invested_amount,
             source.full_amount - source.invested_amount
@@ -20,5 +19,6 @@ def invest_funds(
             if fund.invested_amount == fund.full_amount:
                 fund.fully_invested = True
                 fund.close_date = datetime.now(timezone.utc)
-        update_sources.append(source)
+        if target.fully_invested:
+            break
     return update_sources

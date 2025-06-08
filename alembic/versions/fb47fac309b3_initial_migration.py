@@ -28,7 +28,8 @@ def upgrade():
     sa.Column('create_date', sa.DateTime(), nullable=True),
     sa.Column('close_date', sa.DateTime(), nullable=True),
     sa.CheckConstraint('full_amount > 0', name='check_full_amount_positive'),
-    sa.CheckConstraint('invested_amount >= 0 AND invested_amount <= full_amount', name='check_invested_amount_range'),
+    sa.CheckConstraint('invested_amount >= 0', name='check_invested_amount_non_negative'),
+    sa.CheckConstraint('invested_amount <= full_amount', name='check_invested_amount_not_exceed_full'),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
